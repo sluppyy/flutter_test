@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
+import 'package:scroll_snap_list/scroll_snap_list.dart';
+import 'package:startup_namer/MusicChoise.dart';
+import 'package:startup_namer/PageChoise.dart';
+
+import 'GenreChoise.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,7 +12,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,81 +22,88 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.black
         )
       ),
-      home: const RandomWords(),
+      home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class RandomWords extends StatefulWidget {
-  const RandomWords({Key? key}) : super(key: key);
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
 
   @override
-  _RandomWordsState createState() => _RandomWordsState();
+  State<StatefulWidget> createState() => _MainScreen();
 }
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-  final _saved = <WordPair>{};
 
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (context) {
-        final tiles = _saved.map((pair) {
-          return ListTile(title: Text(pair.asSnakeCase, style: _biggerFont));
-        });
+class _MainScreen extends State<MainScreen> {
+  int _selectedIndex = 0;
 
-        final divided = tiles.isNotEmpty
-            ? ListTile.divideTiles(tiles: tiles, context: context).toList()
-            : <Widget>[];
-
-        return Scaffold(
-          appBar: AppBar(title: const Text("Saved Suggestions"),),
-          body: ListView(children: divided,),
-        );
-      })
-    );
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("app bar"),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.list),
-              onPressed: _pushSaved,
-              tooltip: 'Saved Suggestions',
-            )
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        elevation: 0,
+        backgroundColor: const Color(0x00ffffff),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text("Podcasts"),
+            Icon(Icons.mic)
           ],
         ),
-        body: ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemBuilder: (context, i) {
-              if (i.isOdd) return const Divider();
+        leading: IconButton(icon: const Icon(Icons.add_alert), onPressed: () {  }),
+        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {  })],
+      ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: const Color(0x00ffffff),
+        ),
+        child: BottomNavigationBar(
+          elevation: 0,
+          backgroundColor: const Color(0x00ffffff),
+          type: BottomNavigationBarType.shifting,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
+            BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ""),
+            BottomNavigationBarItem(icon: Icon(Icons.album), label: ""),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "")
+          ],
+          selectedItemColor: Colors.redAccent,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+      ),),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/smoke.jpg"),
+                  fit: BoxFit.cover
+              )
+            ),
+          ),
+          Column(
+            children: const [
+              SizedBox(child: PageChoice(), height: 70),
+              Expanded(child: Center(child: SizedBox(child: MusicChoice(), height: 300))),
+              SizedBox(child: Text("Genre", style: TextStyle(fontSize: 30, color: Colors.white)), height: 50),
+              SizedBox(child: GenreChoice(), height: 120 + 16*2)
+            ],
+          ),
+        ],
+      )
 
-              final index = i ~/ 2;
-              if (index >= _suggestions.length) {
-                  _suggestions.addAll(generateWordPairs().take(10));}
-
-              final pair = _suggestions[index];
-              final alreadySaved = _saved.contains(pair);
-              return ListTile(
-                title: Text(pair.asSnakeCase, style: _biggerFont,),
-                trailing: Icon(
-                  alreadySaved ? Icons.favorite : Icons.favorite_border,
-                  color: alreadySaved ? Colors.red : null,
-                  semanticLabel: alreadySaved ? "Remove from saved" : "Save",
-                ),
-                onTap: () {
-                  setState(() {
-                    alreadySaved ? _saved.remove(pair) : _saved.add(pair);
-                  });
-                },
-              );
-            }
-        )
     );
   }
 }
+
+
+
