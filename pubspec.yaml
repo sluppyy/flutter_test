@@ -37,6 +37,12 @@ dependencies:
   english_words: ^4.0.0
   horizontal_card_pager: ^1.1.1
   scroll_snap_list: ^0.8.4
+  video_player: ^2.3.0
+  http: ^0.13.4
+  json_serializable: ^6.1.6
+  json_annotation: ^4.4.0
+  build_runner: ^2.1.10
+  rxdart: ^0.27.3
 
 dev_dependencies:
   flutter_test:
@@ -55,8 +61,7 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - assets/danse.jpg
-    - assets/smoke.jpg
+    - assets/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
